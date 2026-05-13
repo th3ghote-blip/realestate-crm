@@ -68,6 +68,23 @@ router.get('/me', requireAuth, (req, res) => {
   res.json({ agent: publicAgent(req.agent) });
 });
 
+const profileSchema = z.object({
+  name: z.string().min(1).max(120).optional(),
+  phone: z.string().max(40).nullable().optional(),
+  idealistaProfileUrl: z.string().url().max(500).nullable().optional(),
+  fotocasaProfileUrl: z.string().url().max(500).nullable().optional(),
+});
+
+router.patch('/me', requireAuth, async (req, res) => {
+  const parsed = profileSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: 'invalid_input' });
+  const agent = await prisma.agent.update({
+    where: { id: req.agent.id },
+    data: parsed.data,
+  });
+  res.json({ agent: publicAgent(agent) });
+});
+
 function publicAgent(agent) {
   return {
     id: agent.id,
