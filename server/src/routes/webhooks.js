@@ -2,6 +2,7 @@ import { Router } from 'express';
 import multer from 'multer';
 import { prisma } from '../db.js';
 import { parseInboundLeadEmail } from '../services/emailParser.js';
+import { maybeSendQualificationEmail } from '../services/qualification.js';
 
 const router = Router();
 
@@ -33,17 +34,19 @@ router.post('/sendgrid/inbound', upload.any(), async (req, res) => {
     }
 
     let listingId = null;
+    let listing = null;
     if (parsed.listingRef?.externalId) {
-      const listing = await prisma.listing.findFirst({
+      listing = await prisma.listing.findFirst({
         where: {
           agentId: agent.id,
           externalId: parsed.listingRef.externalId,
           ...(parsed.listingRef.source ? { source: parsed.listingRef.source } : {}),
         },
-        select: { id: true },
       });
       if (listing) listingId = listing.id;
     }
+
+    const needsQualification = listing && listing.financingEligible === false;
 
     const lead = await prisma.lead.create({
       data: {
@@ -54,6 +57,7 @@ router.post('/sendgrid/inbound', upload.any(), async (req, res) => {
         phone: parsed.lead.phone,
         source: parsed.source,
         status: 'new',
+        qualificationStatus: needsQualification ? 'in_progress' : 'unqualified',
         lastActivityAt: new Date(),
         messages: {
           create: {
@@ -68,7 +72,15 @@ router.post('/sendgrid/inbound', upload.any(), async (req, res) => {
       include: { messages: true },
     });
 
-    res.status(200).json({ ok: true, leadId: lead.id });
+    if (needsQualification) {
+      // Fire and forget — webhook returns 200 even if outbound email fails so
+      // SendGrid doesn't pile up retries. The notification stays as a flag.
+      maybeSendQualificationEmail({ lead, listing, agent }).catch((err) => {
+        console.warn('[webhook] qualification email failed', lead.id, err.message);
+      });
+    }
+
+    res.status(200).json({ ok: true, leadId: lead.id, qualificationTriggered: needsQualification });
   } catch (err) {
     console.error('[webhook] sendgrid inbound failed', err);
     // Return 200 so SendGrid doesn't pile up retries on a malformed message; we've logged it.
