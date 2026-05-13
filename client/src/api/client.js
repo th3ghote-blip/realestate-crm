@@ -41,6 +41,13 @@ export const listings = {
   startImport: (profileUrl) => api.post('/listings/import', { profileUrl }).then((r) => r.data),
   getJob: (jobId) => api.get(`/listings/import/${jobId}`).then((r) => r.data),
   recentJobs: () => api.get('/listings/import').then((r) => r.data),
+  uploadCsv: (file) => {
+    const fd = new FormData();
+    fd.append('file', file);
+    return api.post('/listings/import/csv', fd, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }).then((r) => r.data);
+  },
 };
 
 export default api;

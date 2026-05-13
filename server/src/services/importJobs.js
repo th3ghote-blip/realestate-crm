@@ -6,6 +6,7 @@
 import { randomUUID } from 'crypto';
 import { prisma } from '../db.js';
 import { scrapeProfile, detectPortal } from './scraper/index.js';
+import { parseListingsCsv } from './csvImport.js';
 
 const jobs = new Map(); // jobId -> { agentId, portal, profileUrl, status, total, imported, log, error, finishedAt }
 
@@ -100,6 +101,40 @@ async function runJob(job) {
 
   job.status = 'completed';
   job.finishedAt = Date.now();
+}
+
+/** Synchronous CSV import — completes within the request lifecycle. */
+export async function importCsv({ agentId, buffer }) {
+  const parsed = parseListingsCsv(buffer);
+  if (!parsed.ok) {
+    return { ok: false, error: parsed.error, message: parsed.message, mapping: parsed.mapping, headers: parsed.headers };
+  }
+
+  const job = {
+    id: randomUUID(),
+    agentId,
+    portal: 'csv',
+    profileUrl: null,
+    status: 'running',
+    total: parsed.listings.length,
+    imported: 0,
+    error: null,
+    message: null,
+    startedAt: Date.now(),
+    finishedAt: null,
+  };
+  jobs.set(job.id, job);
+
+  await persistListings(agentId, parsed.listings, job);
+
+  job.status = 'completed';
+  job.finishedAt = Date.now();
+  return {
+    ok: true,
+    job: snapshot(job),
+    skipped: parsed.skipped,
+    mapping: parsed.mapping,
+  };
 }
 
 async function persistListings(agentId, listings, job) {

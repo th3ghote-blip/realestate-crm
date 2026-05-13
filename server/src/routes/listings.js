@@ -1,8 +1,11 @@
 import { Router } from 'express';
 import { z } from 'zod';
+import multer from 'multer';
 import { prisma } from '../db.js';
 import { requireAuth } from '../middleware/auth.js';
-import { startImport, getJob, listAgentJobs } from '../services/importJobs.js';
+import { startImport, getJob, listAgentJobs, importCsv } from '../services/importJobs.js';
+
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 
 const router = Router();
 
@@ -60,6 +63,14 @@ router.get('/import/:jobId', (req, res) => {
 // GET /api/listings/import — recent jobs (for showing "last import" state)
 router.get('/import', (req, res) => {
   res.json({ jobs: listAgentJobs(req.agent.id) });
+});
+
+// POST /api/listings/import/csv — multipart upload of a portfolio CSV
+router.post('/import/csv', upload.single('file'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'no_file' });
+  const result = await importCsv({ agentId: req.agent.id, buffer: req.file.buffer });
+  if (!result.ok) return res.status(400).json(result);
+  res.status(201).json(result);
 });
 
 export default router;
