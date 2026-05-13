@@ -35,4 +35,12 @@ export const leads = {
   get: (id) => api.get(`/leads/${id}`).then((r) => r.data),
 };
 
+export const listings = {
+  list: () => api.get('/listings').then((r) => r.data),
+  patch: (id, data) => api.patch(`/listings/${id}`, data).then((r) => r.data),
+  startImport: (profileUrl) => api.post('/listings/import', { profileUrl }).then((r) => r.data),
+  getJob: (jobId) => api.get(`/listings/import/${jobId}`).then((r) => r.data),
+  recentJobs: () => api.get('/listings/import').then((r) => r.data),
+};
+
 export default api;

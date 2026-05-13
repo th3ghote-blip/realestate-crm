@@ -3,7 +3,7 @@ import { clearSession, getAgent } from '../auth.js';
 
 const tabs = [
   { to: '/inbox', label: 'Bandeja' },
-  { to: '/listings', label: 'Inmuebles', disabled: true },
+  { to: '/listings', label: 'Inmuebles' },
   { to: '/pipeline', label: 'Pipeline', disabled: true },
   { to: '/settings', label: 'Ajustes' },
 ];

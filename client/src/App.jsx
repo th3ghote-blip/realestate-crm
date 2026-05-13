@@ -3,6 +3,8 @@ import { isAuthenticated } from './auth.js';
 import Login from './pages/Login.jsx';
 import Signup from './pages/Signup.jsx';
 import Inbox from './pages/Inbox.jsx';
+import Listings from './pages/Listings.jsx';
+import ListingImport from './pages/ListingImport.jsx';
 import Settings from './pages/Settings.jsx';
 import AppShell from './components/AppShell.jsx';
 
@@ -26,6 +28,8 @@ export default function App() {
       >
         <Route index element={<Navigate to="/inbox" replace />} />
         <Route path="inbox" element={<Inbox />} />
+        <Route path="listings" element={<Listings />} />
+        <Route path="listings/import" element={<ListingImport />} />
         <Route path="settings" element={<Settings />} />
       </Route>
 

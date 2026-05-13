@@ -4,6 +4,7 @@ import cors from 'cors';
 
 import authRouter from './routes/auth.js';
 import leadsRouter from './routes/leads.js';
+import listingsRouter from './routes/listings.js';
 import webhooksRouter from './routes/webhooks.js';
 
 const app = express();
@@ -21,6 +22,7 @@ app.get('/health', (_req, res) => res.json({ ok: true }));
 
 app.use('/api/auth', authRouter);
 app.use('/api/leads', leadsRouter);
+app.use('/api/listings', listingsRouter);
 app.use('/webhooks', webhooksRouter);
 
 app.use((err, _req, res, _next) => {
