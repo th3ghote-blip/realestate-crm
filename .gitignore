@@ -1,0 +1,10 @@
+node_modules/
+.env
+.env.local
+dist/
+build/
+.DS_Store
+*.log
+.vite/
+coverage/
+prisma/migrations/dev.db*

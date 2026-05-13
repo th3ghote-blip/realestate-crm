@@ -1,0 +1,35 @@
+import { Navigate, Route, Routes } from 'react-router-dom';
+import { isAuthenticated } from './auth.js';
+import Login from './pages/Login.jsx';
+import Signup from './pages/Signup.jsx';
+import Inbox from './pages/Inbox.jsx';
+import Settings from './pages/Settings.jsx';
+import AppShell from './components/AppShell.jsx';
+
+function RequireAuth({ children }) {
+  return isAuthenticated() ? children : <Navigate to="/login" replace />;
+}
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+
+      <Route
+        path="/"
+        element={
+          <RequireAuth>
+            <AppShell />
+          </RequireAuth>
+        }
+      >
+        <Route index element={<Navigate to="/inbox" replace />} />
+        <Route path="inbox" element={<Inbox />} />
+        <Route path="settings" element={<Settings />} />
+      </Route>
+
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}

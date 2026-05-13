@@ -1,0 +1,178 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Agent {
+  id                    String   @id @default(uuid())
+  name                  String
+  email                 String   @unique
+  phone                 String?
+  passwordHash          String
+  inboundEmailAddress   String   @unique
+  idealistaProfileUrl   String?
+  fotocasaProfileUrl    String?
+  createdAt             DateTime @default(now())
+
+  listings      Listing[]
+  leads         Lead[]
+  messages      Message[]
+  notifications Notification[]
+}
+
+enum ListingSource {
+  idealista
+  fotocasa
+  manual
+}
+
+enum PropertyType {
+  apartment
+  house
+  finca
+  commercial
+  land
+  other
+}
+
+enum ListingStatus {
+  active
+  off_market
+}
+
+model Listing {
+  id                 String        @id @default(uuid())
+  agent              Agent         @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  agentId            String
+  source             ListingSource
+  externalId         String?
+  title              String
+  description        String?
+  price              Int?
+  location           String?
+  address            String?
+  propertyType       PropertyType  @default(other)
+  status             ListingStatus @default(active)
+  financingEligible  Boolean       @default(true)
+  images             String[]
+  url                String?
+  lastCheckedAt      DateTime?
+  createdAt          DateTime      @default(now())
+
+  leads         Lead[]
+  notifications Notification[]
+
+  @@unique([agentId, source, externalId])
+  @@index([agentId, status])
+}
+
+enum LeadSource {
+  idealista
+  fotocasa
+  direct
+}
+
+enum LeadStatus {
+  new
+  contacted
+  qualified
+  viewing
+  offer
+  closed
+  lost
+}
+
+enum FinancingType {
+  unknown
+  mortgage
+  cash
+}
+
+enum QualificationStatus {
+  unqualified
+  in_progress
+  qualified
+  disqualified
+}
+
+model Lead {
+  id                  String              @id @default(uuid())
+  agent               Agent               @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  agentId             String
+  listing             Listing?            @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  listingId           String?
+  name                String
+  email               String?
+  phone               String?
+  source              LeadSource          @default(direct)
+  status              LeadStatus          @default(new)
+  financingType       FinancingType       @default(unknown)
+  qualificationStatus QualificationStatus @default(unqualified)
+  notes               String?
+  lastActivityAt      DateTime            @default(now())
+  createdAt           DateTime            @default(now())
+
+  messages      Message[]
+  notifications Notification[]
+
+  @@index([agentId, lastActivityAt])
+  @@index([agentId, status])
+}
+
+enum MessageDirection {
+  inbound
+  outbound
+}
+
+enum MessageChannel {
+  email
+  whatsapp
+  whatsapp_link
+}
+
+model Message {
+  id        String           @id @default(uuid())
+  lead      Lead             @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  leadId    String
+  agent     Agent            @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  agentId   String
+  direction MessageDirection
+  channel   MessageChannel
+  subject   String?
+  body      String
+  sentAt    DateTime         @default(now())
+
+  @@index([leadId, sentAt])
+}
+
+enum NotificationType {
+  off_market
+  qualification_needed
+  follow_up_reminder
+}
+
+enum NotificationStatus {
+  pending
+  sent
+  dismissed
+}
+
+model Notification {
+  id        String             @id @default(uuid())
+  agent     Agent              @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  agentId   String
+  lead      Lead?              @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  leadId    String?
+  listing   Listing?           @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  listingId String?
+  type      NotificationType
+  status    NotificationStatus @default(pending)
+  message   String?
+  createdAt DateTime           @default(now())
+
+  @@index([agentId, status])
+}
