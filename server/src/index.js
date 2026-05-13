@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 
 import authRouter from './routes/auth.js';
+import dashboardRouter from './routes/dashboard.js';
 import leadsRouter from './routes/leads.js';
 import listingsRouter from './routes/listings.js';
 import notificationsRouter from './routes/notifications.js';
@@ -23,6 +24,7 @@ app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
 app.use('/api/auth', authRouter);
+app.use('/api/dashboard', dashboardRouter);
 app.use('/api/leads', leadsRouter);
 app.use('/api/listings', listingsRouter);
 app.use('/api/notifications', notificationsRouter);

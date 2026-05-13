@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { clearSession, getAgent } from '../auth.js';
 import NotificationsBell from './NotificationsBell.jsx';
 
@@ -22,10 +22,10 @@ export default function AppShell() {
     <div className="min-h-full flex flex-col">
       <header className="bg-white border-b border-slate-200 sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <Link to="/dashboard" className="flex items-center gap-2 hover:opacity-90">
             <div className="h-8 w-8 rounded-lg bg-brand-600 text-white flex items-center justify-center font-bold">R</div>
             <div className="font-semibold">CRM Inmobiliario</div>
-          </div>
+          </Link>
           <div className="flex items-center gap-3 text-sm">
             <NotificationsBell />
             <span className="hidden sm:inline text-slate-600">{agent?.name}</span>

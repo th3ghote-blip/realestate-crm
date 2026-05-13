@@ -7,6 +7,7 @@ import LeadDetail from './pages/LeadDetail.jsx';
 import Listings from './pages/Listings.jsx';
 import ListingImport from './pages/ListingImport.jsx';
 import Pipeline from './pages/Pipeline.jsx';
+import Dashboard from './pages/Dashboard.jsx';
 import Settings from './pages/Settings.jsx';
 import AppShell from './components/AppShell.jsx';
 
@@ -29,6 +30,7 @@ export default function App() {
         }
       >
         <Route index element={<Navigate to="/inbox" replace />} />
+        <Route path="dashboard" element={<Dashboard />} />
         <Route path="inbox" element={<Inbox />} />
         <Route path="leads/:id" element={<LeadDetail />} />
         <Route path="listings" element={<Listings />} />

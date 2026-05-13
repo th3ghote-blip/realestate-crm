@@ -52,6 +52,10 @@ export const listings = {
   },
 };
 
+export const dashboard = {
+  get: () => api.get('/dashboard').then((r) => r.data),
+};
+
 export const notifications = {
   list: () => api.get('/notifications').then((r) => r.data),
   count: () => api.get('/notifications/count').then((r) => r.data),
