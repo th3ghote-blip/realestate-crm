@@ -33,6 +33,8 @@ export const auth = {
 export const leads = {
   list: () => api.get('/leads').then((r) => r.data),
   get: (id) => api.get(`/leads/${id}`).then((r) => r.data),
+  patch: (id, data) => api.patch(`/leads/${id}`, data).then((r) => r.data),
+  sendMessage: (id, data) => api.post(`/leads/${id}/messages`, data).then((r) => r.data),
 };
 
 export const listings = {

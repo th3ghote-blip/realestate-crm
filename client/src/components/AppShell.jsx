@@ -4,7 +4,7 @@ import { clearSession, getAgent } from '../auth.js';
 const tabs = [
   { to: '/inbox', label: 'Bandeja' },
   { to: '/listings', label: 'Inmuebles' },
-  { to: '/pipeline', label: 'Pipeline', disabled: true },
+  { to: '/pipeline', label: 'Pipeline' },
   { to: '/settings', label: 'Ajustes' },
 ];
 
@@ -46,7 +46,6 @@ export default function AppShell() {
                     : 'text-slate-600 border-transparent hover:text-slate-900'
                 }`
               }
-              end
             >
               {tab.label}
             </NavLink>
