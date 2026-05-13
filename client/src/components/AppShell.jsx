@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { clearSession, getAgent } from '../auth.js';
+import NotificationsBell from './NotificationsBell.jsx';
 
 const tabs = [
   { to: '/inbox', label: 'Bandeja' },
@@ -26,6 +27,7 @@ export default function AppShell() {
             <div className="font-semibold">CRM Inmobiliario</div>
           </div>
           <div className="flex items-center gap-3 text-sm">
+            <NotificationsBell />
             <span className="hidden sm:inline text-slate-600">{agent?.name}</span>
             <button onClick={handleLogout} className="text-slate-500 hover:text-slate-900">
               Salir

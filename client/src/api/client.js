@@ -52,4 +52,11 @@ export const listings = {
   },
 };
 
+export const notifications = {
+  list: () => api.get('/notifications').then((r) => r.data),
+  count: () => api.get('/notifications/count').then((r) => r.data),
+  dismiss: (id) => api.patch(`/notifications/${id}`, { status: 'dismissed' }).then((r) => r.data),
+  dismissAll: () => api.post('/notifications/dismiss-all').then((r) => r.data),
+};
+
 export default api;
